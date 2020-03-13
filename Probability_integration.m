@@ -1,7 +1,7 @@
 % Uncertainty update and integration based on contact relationship
 
-% if exist('Pzlxme')
-    clear x m Pzlx Pzlxm fmlz_divide_fmlx ZlXE Pzlxe ZlXE_info Pzlxme Pzlxme_norm Pzlxme_cdf;
+% if exist('pZlDeK')
+    clear x m pZlD pZlDK pKlZ pZlDe pZlDeK pZlDeK_norm pZlDeK_cdf;
 % end
 
 Z_Pfieldmin= ;	%range of Z
@@ -29,59 +29,59 @@ end
 
 for m=1:n_Pfield    
     ZSpace_Pfield(m,1)=Z_Pfieldmin+dz_Pfield*(m-1);   
-    Pzlx(m,1)=normpdf(ZSpace_Pfield(m,1),zkrig,sqrt(zv));   
-    Pzlxm(m,1)=normpdf(ZSpace_Pfield(m,1),zm,sqrt(zv));          
+    pZlD(m,1)=normpdf(ZSpace_Pfield(m,1),zkrig,sqrt(zv));   
+    pZlDK(m,1)=normpdf(ZSpace_Pfield(m,1),zm,sqrt(zv));          
 end
 
 for m=1:n_Pfield    
-    fmlz_divide_fmlx(m,1)=exp(((zm-zkrig)*ZSpace_Pfield(m,1)+(zkrig^2-zm^2)/2)/zv);
+    pKlZ(m,1)=exp(((zm-zkrig)*ZSpace_Pfield(m,1)+(zkrig^2-zm^2)/2)/zv);
 end
 
 % update BMEpdf with existing model
 row=(j-1)*ny_grid+i;    
 if isnan(InterfaceZ_xypdf{k,1}(row,1))  
-    Pzlxe=Pzlx;
+    pZlDe=pZlD;
 else    
-    Pzlxe=InterfaceZ_xypdf{k,1}(row,:)';
-    Pzlxe(isnan(Pzlxe))=0;  
-    Pzlxe(find(Pzlxe<0))=0; 
-    Pzlxe(find(Pzlxe>1))=1; 
+    pZlDe=InterfaceZ_xypdf{k,1}(row,:)';
+    pZlDe(isnan(pZlDe))=0;  
+    pZlDe(find(pZlDe<0))=0; 
+    pZlDe(find(pZlDe>1))=1; 
 end
 % show P(Z|X,E)
-% plot(ZSpace_Pfield,Pzlxe,'b:');
+% plot(ZSpace_Pfield,pZlDe,'b:');
 % hold on;
-Pzlxme=Pzlxe.*fmlz_divide_fmlx;
-Pzlxme(isnan(Pzlxme))=0;
+pZlDeK=pZlDe.*pKlZ;
+pZlDeK(isnan(pZlDeK))=0;
 
-c=1/trapz(ZSpace_Pfield,Pzlxme);
-Pzlxme_norm=c*Pzlxme;   
-Pzlxme_Pdf{i,j}(:,k)=Pzlxme_norm;
+c=1/trapz(ZSpace_Pfield,pZlDeK);
+pZlDeK_norm=c*pZlDeK;   
+pZlDeK_Pdf{i,j}(:,k)=pZlDeK_norm;
 % show P(Z|X,E,M)
-% plot(ZSpace_Pfield,Pzlxme_norm,'r--');
+% plot(ZSpace_Pfield,pZlDeK_norm,'r--');
 % title('P(Z|X)(r), P(Z|X,M)(g), P(Z|X,E)(b), P(Z|X,E,M)(r--)');
 
 %transform pdf to cdf
-for m=1:size(Pzlxme_norm,1)
+for m=1:size(pZlDeK_norm,1)
     if m>1
-        Pzlxme_cdf(m,1)=trapz(ZSpace_Pfield(1:m,1),Pzlxme_norm(1:m,1));
+        pZlDeK_cdf(m,1)=trapz(ZSpace_Pfield(1:m,1),pZlDeK_norm(1:m,1));
     end
 end
 % figure;
-% plot(ZSpace_Pfield,Pzlxme_cdf,'b-');
+% plot(ZSpace_Pfield,pZlDeK_cdf,'b-');
 % title('P(Z|X,E,M) Cdf');
 
-Pzlxme_Pfieldcdf{i,j}(:,k)=Pzlxme_cdf;
+pZlDeK_Pfieldcdf{i,j}(:,k)=pZlDeK_cdf;
 
 Interface_ZPfield{k,1}(i,j)=ZSpace_Pfield(No_ZPfield,1);
 else
-    Pzlxme_Pdf{i,j}(:,k)=zeros(size(ZSpace_Pfield));
-    Pzlxme_Pfieldcdf{i,j}(:,k)=zeros(size(ZSpace_Pfield));
+    pZlDeK_Pdf{i,j}(:,k)=zeros(size(ZSpace_Pfield));
+    pZlDeK_Pfieldcdf{i,j}(:,k)=zeros(size(ZSpace_Pfield));
 end
      end
-     Pzlxme_Pdf{i,j}(find(Pzlxme_Pdf{i,j}<0))=0;
-     Pzlxme_Pfieldcdf{i,j}(find(Pzlxme_Pfieldcdf{i,j}<0))=0;
-     Pzlxme_Pfieldcdf{i,j}(find(Pzlxme_Pfieldcdf{i,j}>1))=1;
-     Pzlxme_Pfieldcdf{i,j}(isnan(Pzlxme_Pfieldcdf{i,j}))=0;
+     pZlDeK_Pdf{i,j}(find(pZlDeK_Pdf{i,j}<0))=0;
+     pZlDeK_Pfieldcdf{i,j}(find(pZlDeK_Pfieldcdf{i,j}<0))=0;
+     pZlDeK_Pfieldcdf{i,j}(find(pZlDeK_Pfieldcdf{i,j}>1))=1;
+     pZlDeK_Pfieldcdf{i,j}(isnan(pZlDeK_Pfieldcdf{i,j}))=0;
 
 %Contact relationship of strata
 Contact_list(1,1)=Interface_0_domain(i,j);	%starting from stratum ID: 0
@@ -94,7 +94,7 @@ ZPfield{i,j}(:,k_add_1)=ones(size(ZSpace_Pfield));
 %Integration based on contact relationship
 for k_add_1=2:n_interface+1    
     if Contact_list(k_add_1,1)  
-        ZPfield{i,j}(:,k_add_1)=Pzlxme_Pfieldcdf{i,j}(:,k_add_1-1);
+        ZPfield{i,j}(:,k_add_1)=pZlDeK_Pfieldcdf{i,j}(:,k_add_1-1);
         if Contact_list(k_add_1-1,1)  
             ZPfield{i,j}(:,k_add_1-1)=ZPfield{i,j}(:,k_add_1-1).*(ones(size(ZSpace_Pfield))-ZPfield{i,j}(:,k_add_1));
             if k_add_1>2
@@ -128,4 +128,3 @@ fprintf('Probability Integration Complete\n');
 % plot(ZSpace_Pfield,ZPfield{i,j}(:,8),'m-');
 % hold on;
 % plot(ZSpace_Pfield,ZPfield{i,j}(:,10),'c-');
-
